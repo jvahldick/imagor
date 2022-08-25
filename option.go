@@ -179,3 +179,15 @@ func WithSigner(signer imagorpath.Signer) Option {
 		}
 	}
 }
+
+func WithSha1PathHashing(enabled bool) Option {
+	return func(app *Imagor) {
+		app.Sha1PathHashing = enabled
+	}
+}
+
+func WithSha256PathHashing(enabled bool) Option {
+	return func(app *Imagor) {
+		app.Sha256PathHashing = enabled
+	}
+}

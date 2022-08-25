@@ -2,6 +2,9 @@ package imagor
 
 import (
 	"context"
+	"crypto/sha1"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,6 +14,7 @@ import (
 	"golang.org/x/sync/singleflight"
 	"io"
 	"net/http"
+	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
@@ -76,6 +80,8 @@ type Imagor struct {
 	ModifiedTimeCheck     bool
 	DisableErrorBody      bool
 	DisableParamsEndpoint bool
+	Sha1PathHashing       bool
+	Sha256PathHashing     bool
 	BaseParams            string
 	Logger                *zap.Logger
 	Debug                 bool
@@ -255,6 +261,9 @@ func (app *Imagor) Do(r *http.Request, p imagorpath.Params) (blob *Blob, err err
 			resultKey = app.ResultKey.Generate(p)
 		} else {
 			resultKey = p.Path
+		}
+		if len(app.ResultStorages) > 0 {
+			resultKey = app.hashPathKey(resultKey)
 		}
 	}
 	load := func(image string) (*Blob, error) {
@@ -525,6 +534,27 @@ func (app *Imagor) suppress(
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}
+}
+
+func (app *Imagor) hashPathKey(key string) string {
+	if key == "" {
+		return key
+	}
+	hash := ""
+	data := []byte(key)
+	filename := filepath.Base(key)
+	if app.Sha1PathHashing {
+		sha1Hash := sha1.Sum(data)
+		hash = hex.EncodeToString(sha1Hash[:])
+	}
+	if app.Sha256PathHashing {
+		sha256Hash := sha256.Sum256(data)
+		hash = hex.EncodeToString(sha256Hash[:])
+	}
+	if hash == "" {
+		return key
+	}
+	return filepath.Join(hash, filename)
 }
 
 func (app *Imagor) debugLog() {

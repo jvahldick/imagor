@@ -28,6 +28,8 @@ func TestDefault(t *testing.T) {
 	assert.False(t, app.AutoAVIF)
 	assert.False(t, app.DisableErrorBody)
 	assert.False(t, app.DisableParamsEndpoint)
+	assert.False(t, app.Sha1PathHashing)
+	assert.False(t, app.Sha256PathHashing)
 	assert.Equal(t, time.Hour*24*7, app.CacheHeaderTTL)
 	assert.Equal(t, time.Hour*24, app.CacheHeaderSWR)
 	assert.Empty(t, app.ResultStorages)
@@ -43,6 +45,8 @@ func TestBasic(t *testing.T) {
 		"-imagor-unsafe",
 		"-imagor-auto-webp",
 		"-imagor-auto-avif",
+		"-imagor-sha1-result-path-hashing",
+		"-imagor-sha256-result-path-hashing",
 		"-imagor-disable-error-body",
 		"-imagor-disable-params-endpoint",
 		"-imagor-request-timeout", "16s",
@@ -64,6 +68,8 @@ func TestBasic(t *testing.T) {
 	assert.True(t, app.AutoWebP)
 	assert.True(t, app.DisableErrorBody)
 	assert.True(t, app.DisableParamsEndpoint)
+	assert.True(t, app.Sha1PathHashing)
+	assert.True(t, app.Sha256PathHashing)
 	assert.Equal(t, "RrTsWGEXFU2s1J1mTl1j_ciO-1E=", app.Signer.Sign("bar"))
 	assert.Equal(t, time.Second*16, app.RequestTimeout)
 	assert.Equal(t, time.Second*7, app.LoadTimeout)
